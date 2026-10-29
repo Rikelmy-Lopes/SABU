@@ -7,8 +7,11 @@ This document contains the project overview, architectural constraints, sample d
 ## 1. Project Overview
 
 - **Project Name:** SABU (Sistema de Análise de Boletim de Urnas — Ballot Box Bulletin Analysis System)
-- **Primary Language:** Rust
+- **Primary Language:** Rust (version 1.99.x)
 - **Target Platform:** Windows. The application is built to run on Windows.
+- **Product Name:** Sabu
+- **Distribution:** The final `.exe` must be an installer executable, built with `cargo-wix` (WiX Toolset).
+- **Installation:** Per-user installation (no administrator rights required) in `%LOCALAPPDATA%\Programs\Sabu`.
 - **Graphical User Interface (GUI):** `egui` (via `eframe`)
 - **Objective:** Process, analyze, and display large volumes of data extracted from Ballot Box Bulletins (CSV format) in an extremely fast, intuitive, and testable manner.
 
@@ -18,7 +21,8 @@ This document contains the project overview, architectural constraints, sample d
 
 ### 2.1. Core / GUI Decoupling
 
-- **Golden Rule:** The `core` module/crate **must not** depend on any user interface components (`egui`, rendering, or visual layout logic).
+- `core` is a **separate crate** inside a Cargo workspace. Its package name is `sabu_core`, because `core` conflicts with Rust's built-in `core` crate.
+- **Golden Rule:** The `sabu_core` crate **must not** depend on any user interface components (`egui`, rendering, or visual layout logic). Its `Cargo.toml` must never list `egui` or `eframe`.
 - The `core` is strictly responsible for CSV parsing, business logic, analytics data structures, and state management.
 - The GUI layer (`egui`) acts purely as a consumer of `core`, interacting strictly via exposed APIs and command execution.
 
@@ -56,6 +60,19 @@ This document contains the project overview, architectural constraints, sample d
 - The interface must support a dark theme and a white theme.
 - Both themes must use simple colors.
 
+### 2.7. Error Handling
+
+- Never use `unwrap()` or `panic!` (including `expect()`) in the code.
+- All fallible operations must return `Result` and handle errors explicitly.
+
+### 2.8. Logging
+
+- The application must write logs to a `logs.log` file inside `%LOCALAPPDATA%\Sabu`.
+
+### 2.9. Configuration
+
+- The application must save its configuration (language, theme, etc) in a `config.json` file inside `%LOCALAPPDATA%\Sabu`.
+
 ---
 
 ## 3. Data Specification & Context
@@ -74,7 +91,10 @@ This document contains the project overview, architectural constraints, sample d
 2. **Test Scope:**
    - Test `Command` implementations and `core` functions independently.
    - Use test fixtures based on `example/data.csv` or minimal mock CSV strings for parser and analyzer tests.
-3. **Mandatory Quality Checks:**
+3. **Test Location:**
+   - Tests must be written in separate files, in the same folder as the code they test.
+   - Do not write inline tests (`#[cfg(test)] mod tests { ... }`) inside source files.
+4. **Mandatory Quality Checks:**
    - Ensure `cargo check`, `cargo test`, and `cargo clippy` pass with zero warnings or errors before finalizing any modification.
 
 ---
@@ -83,6 +103,10 @@ This document contains the project overview, architectural constraints, sample d
 
 ```text
 sabu/
+├── Cargo.toml               # Workspace root and application package
+├── sabu_core/               # Separate crate: business logic, CSV parser, analytics engine (GUI independent)
+│   ├── Cargo.toml
+│   └── src/
 ├── example/
 │   └── data.csv             # Sample dataset for testing and reference
 ├── locales/
@@ -90,7 +114,6 @@ sabu/
 │   └── en.json              # English translations (future use)
 ├── src/
 │   ├── main.rs
-│   ├── core/                # Business logic, CSV parser, analytics engine (GUI independent)
 │   ├── commands/            # Action handlers implementing the Command pattern
 │   ├── i18n/                # JSON translation loader and manager
 │   └── ui/                  # Graphical interface components (egui/eframe)
@@ -103,11 +126,11 @@ sabu/
 
 When implementing features or fixing bugs in **SABU**:
 
-1. **Maintain Architectural Boundaries:** Determine whether changes belong in `core`, `commands`, `i18n`, or `ui`. Do not mix concerns.
+1. **Maintain Architectural Boundaries:** Determine whether changes belong in `sabu_core`, `commands`, `i18n`, or `ui`. Do not mix concerns.
 2. **Encapsulate Actions:** Implement all user actions as discrete `Command` structs.
 3. **Write Tests Alongside Changes:** Never complete a task without associated automated tests proving correctness.
 4. **Enforce i18n Rules:** When adding new UI strings, update `pt-BR.json` immediately using consistent key naming conventions.
 5. **Verify Performance:** Ensure CSV parsing and data aggregation routines maintain high performance and never block the main event loop.
-6. **Use Clear Names:** Use clear, descriptive names written in `snake_case`.
+6. **Use Clear Names:** Use clear, descriptive names and follow all Rust naming conventions as needed (`snake_case` for functions, variables, and modules; `UpperCamelCase` for types and traits; `SCREAMING_SNAKE_CASE` for constants).
 7. **Keep `AGENTS.md` Updated:** When the project changes, update `AGENTS.md` with important information only.
 8. **Ask When Unclear:** If something is unclear, ask. Do not guess.
