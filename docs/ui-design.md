@@ -1,0 +1,39 @@
+# UI Design
+
+Guidelines for the SABU graphical interface.
+
+## Technology
+
+- GUI library: `egui` (via `eframe`).
+- The UI code is in `src/ui/`.
+- The UI is only a consumer of `sabu_core`. It uses exposed APIs and commands.
+
+## Interaction with the Core
+
+- The UI sends commands to an execution queue or handler.
+- The UI never changes core state directly.
+- Long operations (such as CSV processing) run in the background.
+- The main UI thread must never be blocked or frozen.
+
+## Themes
+
+- The interface supports a **dark theme** and a **white theme**.
+- Both themes use simple colors.
+- The selected theme is saved in `config.json`, in `%LOCALAPPDATA%\Sabu`.
+
+## Text and Language
+
+- No user-facing text is hardcoded in `ui`. Labels, messages, and tooltips come from the `i18n` dictionary loader.
+- Default language: Brazilian Portuguese (`pt-BR`). English (`en`) is planned for the future.
+- If a key is missing in the active language, the `pt-BR` text is shown.
+- Numbers, dates, and plurals follow the format of the active language.
+- The selected language is saved in `config.json`.
+
+## Error Display
+
+- Errors are returned as `Result` and handled explicitly. The UI must not crash (`unwrap()` and `panic!` are not allowed).
+- Error messages shown to the user also come from the `i18n` dictionary.
+
+## Goal
+
+The interface must be fast and intuitive, even with large volumes of data.

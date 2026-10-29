@@ -134,3 +134,10 @@ When implementing features or fixing bugs in **SABU**:
 6. **Use Clear Names:** Use clear, descriptive names and follow all Rust naming conventions as needed (`snake_case` for functions, variables, and modules; `UpperCamelCase` for types and traits; `SCREAMING_SNAKE_CASE` for constants).
 7. **Keep `AGENTS.md` Updated:** When the project changes, update `AGENTS.md` with important information only.
 8. **Ask When Unclear:** If something is unclear, ask. Do not guess.
+
+## 7. Related Documentation
+
+- [readme.md](readme.md) — Project overview, structure, and runtime files.
+- [docs/architecture.md](docs/architecture.md) — Architecture and design principles.
+- [docs/development.md](docs/development.md) — Development rules, testing, and quality checks.
+- [docs/ui-design.md](docs/ui-design.md) — User interface guidelines.
