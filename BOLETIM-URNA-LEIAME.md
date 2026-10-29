@@ -1,8 +1,6 @@
 ## LEIAME
 
-Este arquivo contém o leiaute das tabelas existentes no repositório de dados eleitorais. Antes de
-
-trabalhar os dados é importante ler as seguintes considerações:
+Este arquivo contém o leiaute das tabelas existentes no repositório de dados eleitorais. Antes de trabalhar os dados é importante ler as seguintes considerações:
 
 - \- A codificação de caracteres dos arquivos é "Latin 1";
 
