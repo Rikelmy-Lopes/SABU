@@ -91,8 +91,8 @@ This document contains the project overview, architectural constraints, sample d
 ## 3. Data Specification & Context
 
 - **Sample Data:** A small sample dataset is available at `example/data.csv`. Use this file for understanding data structure, schema validation, and unit/integration testing.
-- **Data Schema Reference:** Refer to `BOLETIM-URNA-README.md` for complete documentation on CSV columns, data types, and semantic definitions of electoral fields.
-- **Protected Files:** Never change `example/data.csv` or `BOLETIM-URNA-README.md`. They are read-only references.
+- **Data Schema Reference:** Refer to `docs/BOLETIM-URNA-README.md` for complete documentation on CSV columns, data types, and semantic definitions of electoral fields.
+- **Protected Files:** Never change `example/data.csv` or `docs/BOLETIM-URNA-README.md`. They are read-only references.
 - **File Encoding:** CSV files use **Latin-1 (ISO-8859-1)** encoding. The parser must decode them as Latin-1 (e.g., using `encoding_rs`) and convert the text to UTF-8 internally. Tests must include accented characters (e.g., `ç`, `ã`, `é`).
 
 ---
@@ -130,7 +130,11 @@ sabu/
 │   ├── commands/            # Action handlers implementing the Command pattern
 │   ├── i18n/                # JSON translation loader and manager
 │   └── ui/                  # Graphical interface components (egui/eframe)
-└── BOLETIM-URNA-README.md   # Data dictionary and column definitions
+└── docs/
+    ├── architecture.md
+    ├── development.md
+    ├── ui-design.md
+    └── BOLETIM-URNA-README.md   # Data dictionary and column definitions (read-only)
 ```
 
 ---

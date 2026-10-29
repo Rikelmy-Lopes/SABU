@@ -26,8 +26,8 @@ Rules and practices for working on SABU.
 ## Data Files
 
 - `example/data.csv` is a small sample dataset. Use it to understand the data structure, validate the schema, and write tests.
-- `BOLETIM-URNA-README.md` documents the CSV columns, data types, and meaning of the fields.
-- **Never change** `example/data.csv` or `BOLETIM-URNA-README.md`. They are read-only.
+- `docs/BOLETIM-URNA-README.md` documents the CSV columns, data types, and meaning of the fields.
+- **Never change** `example/data.csv` or `docs/BOLETIM-URNA-README.md`. They are read-only.
 - CSV files use Latin-1 (ISO-8859-1). Decode them (for example, with `encoding_rs`) and convert to UTF-8 internally.
 
 ## Adding UI Text

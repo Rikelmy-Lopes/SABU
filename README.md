@@ -36,15 +36,15 @@ sabu/
 ├── docs/
 │   ├── architecture.md
 │   ├── development.md
-│   └── ui-design.md
-├── AGENTS.md                # Guidelines for AI agents
-└── BOLETIM-URNA-README.md   # Data dictionary and column definitions (read-only)
+│   ├── ui-design.md
+│   └── BOLETIM-URNA-README.md   # Data dictionary and column definitions (read-only)
+└── AGENTS.md                # Guidelines for AI agents
 ```
 
 ## Data
 
 - A sample dataset is in `example/data.csv`.
-- The columns and their meaning are described in `BOLETIM-URNA-README.md`.
+- The columns and their meaning are described in `docs/BOLETIM-URNA-README.md`.
 - CSV files use Latin-1 (ISO-8859-1) encoding. SABU converts them to UTF-8 internally.
 
 ## Files Created at Runtime
