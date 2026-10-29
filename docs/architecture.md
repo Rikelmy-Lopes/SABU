@@ -35,7 +35,6 @@ Every user action, state change, or application feature is a **Command**: a stru
 
 The pattern must keep these benefits:
 
-- Clean support for Undo/Redo.
 - Asynchronous background execution, without freezing the main UI thread.
 - Tests for all actions without a UI or a headless display.
 

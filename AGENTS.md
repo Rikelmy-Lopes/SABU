@@ -31,7 +31,6 @@ This document contains the project overview, architectural constraints, sample d
 - **Everything is a Command:** Every user action, state mutation, or application feature must be encapsulated as a structure conforming to a unified Command interface (e.g., `trait Command`).
 - The GUI dispatches commands to an execution queue or handler rather than mutating core state directly.
 - **Mandatory Benefits to Preserve:**
-  - Clean support for Undo/Redo operations.
   - Asynchronous background execution without freezing the main UI thread.
   - Standalone testability for all application actions without needing an instantiated UI or headless display context.
 
