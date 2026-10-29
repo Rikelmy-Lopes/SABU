@@ -12,8 +12,8 @@
 | GUI | `egui` (via `eframe`) |
 | Installer | `.exe` built with `cargo-wix` (WiX Toolset) |
 | Install location | `%LOCALAPPDATA%\Programs\Sabu` (per user, no administrator rights) |
-| Default language | Brazilian Portuguese (`pt-BR`) |
-| Other languages | English (`en`), planned for future activation |
+| Supported language | Brazilian Portuguese (`pt-BR`) only |
+| Future languages | English or others can be added later (the program is built for multiple languages) |
 
 ## Project Structure
 
@@ -27,7 +27,7 @@ sabu/
 │   └── data.csv             # Sample dataset (read-only)
 ├── locales/
 │   ├── pt-BR.json           # Default Portuguese translations
-│   └── en.json              # English translations (future use)
+│   └── ...                  # Future languages (one JSON file per language)
 ├── src/
 │   ├── main.rs
 │   ├── commands/            # Command pattern handlers

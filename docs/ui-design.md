@@ -24,7 +24,8 @@ Guidelines for the SABU graphical interface.
 ## Text and Language
 
 - No user-facing text is hardcoded in `ui`. Labels, messages, and tooltips come from the `i18n` dictionary loader.
-- Default language: Brazilian Portuguese (`pt-BR`). English (`en`) is planned for the future.
+- Only Brazilian Portuguese (`pt-BR`) is supported. English or any other language may be added in the future.
+- The UI must be built to allow multiple languages.
 - If a key is missing in the active language, the `pt-BR` text is shown.
 - Numbers, dates, and plurals follow the format of the active language.
 - The selected language is saved in `config.json`.

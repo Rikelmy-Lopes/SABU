@@ -17,6 +17,9 @@ Rules and practices for working on SABU.
 - Never use `unwrap()` or `panic!` (including `expect()`).
 - Return `Result` from every operation that can fail, and handle errors explicitly.
 - Implement every user action as a separate `Command` struct.
+- Follow the Single Responsibility Principle (SRP) strictly:
+  - Place each responsibility in a separate folder and a separate file.
+  - A file, module, struct, or function must have only one reason to change.
 - Keep `sabu_core` free of GUI dependencies.
 
 ## Data Files
@@ -54,6 +57,7 @@ cargo clippy
 
 1. Decide where the change belongs: `sabu_core`, `commands`, `i18n`, or `ui`.
 2. Implement actions as `Command` structs.
+   Place each responsibility in a separate folder and file (SRP).
 3. Add automated tests.
 4. Update `pt-BR.json` for new UI text.
 5. Check that performance is kept and the main event loop is not blocked.

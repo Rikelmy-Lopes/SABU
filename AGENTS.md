@@ -43,12 +43,12 @@ This document contains the project overview, architectural constraints, sample d
 
 ### 2.4. Internationalization (i18n)
 
-- **Supported Languages:** Brazilian Portuguese (`pt-BR`) currently active, with English (`en`) support designed for future activation.
+- **Supported Languages:** Only Brazilian Portuguese (`pt-BR`) is supported. English or any other language may be added in the future. The program must be built to allow multiple languages, without code changes to add a new one.
 - **Default Language:** `pt-BR`.
-- **Translation Storage:** Translations are stored in JSON files (e.g., `locales/pt-BR.json`, `locales/en.json`).
+- **Translation Storage:** Translations are stored in JSON files (e.g., `locales/pt-BR.json`). Each future language is a new JSON file in `locales/`.
 - **Rule:** No user-facing text strings may be hardcoded in the source code (`core`, `commands`, or `ui`). All text labels, messages, and tooltips must resolve through the `i18n` dictionary loader.
 - **Missing Keys:** If a translation key is missing in the active language, the application must fall back to the Portuguese (`pt-BR`) text.
-- **Number, Date, and Plural Formatting:** Numbers, dates, and plurals must follow the Portuguese (`pt-BR`) or English (`en`) format, according to the active application language.
+- **Number, Date, and Plural Formatting:** Numbers, dates, and plurals must follow the format of the active application language (currently `pt-BR`).
 
 ### 2.5. Language for Code Comments and Documentation
 
@@ -72,6 +72,12 @@ This document contains the project overview, architectural constraints, sample d
 ### 2.9. Configuration
 
 - The application must save its configuration (language, theme, etc) in a `config.json` file inside `%LOCALAPPDATA%\Sabu`.
+
+### 2.10. Single Responsibility Principle (SRP)
+
+- Each responsibility must be placed in its own folder and its own file.
+- Follow the Single Responsibility Principle (SRP) strictly: a file, module, struct, or function must have only one reason to change.
+- Do not put unrelated responsibilities in the same file or folder.
 
 ---
 
@@ -111,7 +117,7 @@ sabu/
 │   └── data.csv             # Sample dataset for testing and reference
 ├── locales/
 │   ├── pt-BR.json           # Default Portuguese translations
-│   └── en.json              # English translations (future use)
+│   └── ...                  # Future languages (one JSON file per language)
 ├── src/
 │   ├── main.rs
 │   ├── commands/            # Action handlers implementing the Command pattern
@@ -126,7 +132,7 @@ sabu/
 
 When implementing features or fixing bugs in **SABU**:
 
-1. **Maintain Architectural Boundaries:** Determine whether changes belong in `sabu_core`, `commands`, `i18n`, or `ui`. Do not mix concerns.
+1. **Maintain Architectural Boundaries:** Determine whether changes belong in `sabu_core`, `commands`, `i18n`, or `ui`. Do not mix concerns. Place each responsibility in a separate folder and file, following SRP (section 2.10).
 2. **Encapsulate Actions:** Implement all user actions as discrete `Command` structs.
 3. **Write Tests Alongside Changes:** Never complete a task without associated automated tests proving correctness.
 4. **Enforce i18n Rules:** When adding new UI strings, update `pt-BR.json` immediately using consistent key naming conventions.
@@ -134,6 +140,8 @@ When implementing features or fixing bugs in **SABU**:
 6. **Use Clear Names:** Use clear, descriptive names and follow all Rust naming conventions as needed (`snake_case` for functions, variables, and modules; `UpperCamelCase` for types and traits; `SCREAMING_SNAKE_CASE` for constants).
 7. **Keep `AGENTS.md` Updated:** When the project changes, update `AGENTS.md` with important information only.
 8. **Ask When Unclear:** If something is unclear, ask. Do not guess.
+
+---
 
 ## 7. Related Documentation
 

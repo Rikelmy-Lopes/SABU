@@ -55,11 +55,12 @@ SABU handles large CSV files from electoral systems.
 
 ## Internationalization (i18n)
 
-- Active language: `pt-BR` (default). `en` is planned for the future.
-- Translations are stored in JSON files: `locales/pt-BR.json` and `locales/en.json`.
+- Only `pt-BR` is supported. English or any other language may be added in the future.
+- The program must be built to allow multiple languages. Adding a language must not need code changes.
+- Translations are stored in JSON files, one per language (for example, `locales/pt-BR.json`).
 - No user-facing text may be hardcoded in `core`, `commands`, or `ui`. All text goes through the `i18n` dictionary loader.
 - If a key is missing in the active language, the application uses the `pt-BR` text.
-- Numbers, dates, and plurals follow the format of the active language (`pt-BR` or `en`).
+- Numbers, dates, and plurals follow the format of the active language (currently `pt-BR`).
 
 ## Error Handling
 
@@ -78,6 +79,14 @@ Configuration (language, theme, etc) is saved in `config.json` in `%LOCALAPPDATA
 
 - The final `.exe` is an installer built with `cargo-wix` (WiX Toolset).
 - Installation is per user, in `%LOCALAPPDATA%\Programs\Sabu`, without administrator rights.
+
+## Single Responsibility Principle (SRP)
+
+SRP is applied strictly in the whole project.
+
+- Each responsibility is placed in a separate folder and a separate file.
+- A file, module, struct, or function has only one reason to change.
+- Unrelated responsibilities are never mixed in the same file or folder.
 
 ## Module Responsibilities
 
