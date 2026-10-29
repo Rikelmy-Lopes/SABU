@@ -17,6 +17,7 @@ Rules and practices for working on SABU.
 - Never use `unwrap()` or `panic!` (including `expect()`).
 - Return `Result` from every operation that can fail, and handle errors explicitly.
 - Implement every user action as a separate `Command` struct.
+- Give every command a unique id, as a `&str` constant (for example, `FILE_OPEN` = `"file.open"`). Never rename an existing id. See [Command IDs](architecture.md#command-ids).
 - Follow the Single Responsibility Principle (SRP) strictly:
   - Place each responsibility in a separate folder and a separate file.
   - A file, module, struct, or function must have only one reason to change.
@@ -56,7 +57,7 @@ cargo clippy
 ## Checklist for Changes
 
 1. Decide where the change belongs: `sabu_core`, `commands`, `i18n`, or `ui`.
-2. Implement actions as `Command` structs.
+2. Implement actions as `Command` structs, each with a unique id.
    Place each responsibility in a separate folder and file (SRP).
 3. Add automated tests.
 4. Update `pt-BR.json` for new UI text.

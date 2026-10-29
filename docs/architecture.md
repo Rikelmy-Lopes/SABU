@@ -38,6 +38,18 @@ The pattern must keep these benefits:
 - Asynchronous background execution, without freezing the main UI thread.
 - Tests for all actions without a UI or a headless display.
 
+### Command IDs
+
+Every command must have a unique id.
+
+- The id is a `&str` constant in `SCREAMING_SNAKE_CASE`.
+- The value uses the format `domain.action`, in lowercase `snake_case`.
+- Ids are stable identifiers, for example for automation. Renaming one is a breaking change, not a refactor.
+
+```rust
+pub const FILE_SAVE: &str = "file.save";
+```
+
 ## Performance
 
 SABU handles large CSV files from electoral systems.

@@ -30,6 +30,14 @@ This document contains the project overview, architectural constraints, sample d
 
 - **Everything is a Command:** Every user action, state mutation, or application feature must be encapsulated as a structure conforming to a unified Command interface (e.g., `trait Command`).
 - The GUI dispatches commands to an execution queue or handler rather than mutating core state directly.
+- **Command IDs:** Every command must have a unique id.
+  - The id is a `&str` constant in `SCREAMING_SNAKE_CASE`, and its value uses the format `domain.action` in lowercase `snake_case`.
+  - Ids are stable identifiers, for example for automation. Renaming one is a breaking change, not a refactor.
+  - Example:
+
+    ```rust
+    pub const FILE_SAVE: &str = "file.save";
+    ```
 - **Mandatory Benefits to Preserve:**
   - Asynchronous background execution without freezing the main UI thread.
   - Standalone testability for all application actions without needing an instantiated UI or headless display context.
