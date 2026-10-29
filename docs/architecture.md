@@ -84,9 +84,11 @@ Configuration (language, theme, etc) is saved in `config.json` in `%LOCALAPPDATA
 
 SRP is applied strictly in the whole project.
 
-- Each responsibility is placed in a separate folder and a separate file.
+- **Strict rule:** every responsibility must live in its own folder and its own file.
 - A file, module, struct, or function has only one reason to change.
-- Unrelated responsibilities are never mixed in the same file or folder.
+- Implementation files must not mix responsibilities. When a change adds a new responsibility, create a new folder and file instead of extending an unrelated file.
+- An implementation file must not have the same name as its containing folder (for example, avoid `config/config.rs`); use a name that describes the responsibility instead (for example, `config/user_config.rs`).
+- Tests for a responsibility live in the same folder as a separate `*_tests.rs` file.
 
 ## Module Responsibilities
 
