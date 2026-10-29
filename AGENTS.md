@@ -1,0 +1,95 @@
+# AGENTS.md — AI Agent Guidelines (SABU)
+
+This document contains the project overview, architectural constraints, sample data reference, and development guidelines for any AI Agent working on the **SABU** codebase.
+
+---
+
+## 1. Project Overview
+
+- **Project Name:** SABU (Sistema de Análise de Boletim de Urnas — Ballot Box Bulletin Analysis System)
+- **Primary Language:** Rust
+- **Graphical User Interface (GUI):** `egui` (via `eframe`)
+- **Objective:** Process, analyze, and display large volumes of data extracted from Ballot Box Bulletins (CSV format) in an extremely fast, intuitive, and testable manner.
+
+---
+
+## 2. Architecture and Design Principles
+
+### 2.1. Core / GUI Decoupling
+
+- **Golden Rule:** The `core` module/crate **must not** depend on any user interface components (`egui`, rendering, or visual layout logic).
+- The `core` is strictly responsible for CSV parsing, business logic, analytics data structures, and state management.
+- The GUI layer (`egui`) acts purely as a consumer of `core`, interacting strictly via exposed APIs and command execution.
+
+### 2.2. Command Pattern
+
+- **Everything is a Command:** Every user action, state mutation, or application feature must be encapsulated as a structure conforming to a unified Command interface (e.g., `trait Command`).
+- The GUI dispatches commands to an execution queue or handler rather than mutating core state directly.
+- **Mandatory Benefits to Preserve:**
+  - Clean support for Undo/Redo operations.
+  - Asynchronous background execution without freezing the main UI thread.
+  - Standalone testability for all application actions without needing an instantiated UI or headless display context.
+
+### 2.3. High Performance & Large-Scale CSV Processing
+
+- **Performance First:** The application handles large CSV files originating from electoral systems.
+- Use concurrency, parallel streaming, and multi-threading wherever appropriate (e.g., leveraging `rayon`).
+- Avoid unnecessary heap allocations, deep copies, and blocking synchronous I/O operations on the main UI thread.
+
+### 2.4. Internationalization (i18n)
+
+- **Supported Languages:** Brazilian Portuguese (`pt-BR`) currently active, with English (`en`) support designed for future activation.
+- **Default Language:** `pt-BR`.
+- **Translation Storage:** Translations are stored in JSON files (e.g., `locales/pt-BR.json`, `locales/en.json`).
+- **Rule:** No user-facing text strings may be hardcoded in the source code (`core`, `commands`, or `ui`). All text labels, messages, and tooltips must resolve through the `i18n` dictionary loader.
+
+---
+
+## 3. Data Specification & Context
+
+- **Sample Data:** A small sample dataset is available at `example/data.csv`. Use this file for understanding data structure, schema validation, and unit/integration testing.
+- **Data Schema Reference:** Refer to `BOLETIM-URNA-README.md` for complete documentation on CSV columns, data types, and semantic definitions of electoral fields.
+
+---
+
+## 4. Testing and Quality Guidelines
+
+1. **Regression Prevention:**
+   - Every new feature, behavior change, or bug fix **MUST** include automated unit or integration tests.
+2. **Test Scope:**
+   - Test `Command` implementations and `core` functions independently.
+   - Use test fixtures based on `example/data.csv` or minimal mock CSV strings for parser and analyzer tests.
+3. **Mandatory Quality Checks:**
+   - Ensure `cargo check`, `cargo test`, and `cargo clippy` pass with zero warnings or errors before finalizing any modification.
+
+---
+
+## 5. Expected Code Structure
+
+```text
+sabu/
+├── example/
+│   └── data.csv             # Sample dataset for testing and reference
+├── locales/
+│   ├── pt-BR.json           # Default Portuguese translations
+│   └── en.json              # English translations (future use)
+├── src/
+│   ├── main.rs
+│   ├── core/                # Business logic, CSV parser, analytics engine (GUI independent)
+│   ├── commands/            # Action handlers implementing the Command pattern
+│   ├── i18n/                # JSON translation loader and manager
+│   └── ui/                  # Graphical interface components (egui/eframe)
+└── BOLETIM-URNA-README.md   # Data dictionary and column definitions
+```
+
+---
+
+## 6. Instructions for AI Agents
+
+When implementing features or fixing bugs in **SABU**:
+
+1. **Maintain Architectural Boundaries:** Determine whether changes belong in `core`, `commands`, `i18n`, or `ui`. Do not mix concerns.
+2. **Encapsulate Actions:** Implement all user actions as discrete `Command` structs.
+3. **Write Tests Alongside Changes:** Never complete a task without associated automated tests proving correctness.
+4. **Enforce i18n Rules:** When adding new UI strings, update `pt-BR.json` immediately using consistent key naming conventions (and prepare `en.json` keys where appropriate).
+5. **Verify Performance:** Ensure CSV parsing and data aggregation routines maintain high performance and never block the main event loop.
