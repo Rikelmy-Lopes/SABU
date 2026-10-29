@@ -1,0 +1,33 @@
+[workspace]
+members = [".", "sabu_core"]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+authors = ["Rikelmy Lopes"]
+
+[package]
+name = "sabu"
+description = "Ballot box bulletin analysis system"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+eframe = "0.37"
+log = "0.4"
+sabu_core = { path = "sabu_core" }
+serde_json = "1"
+simplelog = "0.12"
+thiserror = "2"
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1

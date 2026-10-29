@@ -18,6 +18,10 @@ Rules and practices for working on SABU.
 - Return `Result` from every operation that can fail, and handle errors explicitly.
 - Implement every user action as a separate `Command` struct.
 - Keep `sabu_core` free of GUI dependencies.
+- **Apply the Single Responsibility Principle:** every responsibility gets its own folder and file.
+  - `mod.rs` contains only wiring: `mod` declarations, re-exports, and test module declarations.
+  - Implementation files must not mix responsibilities and must not share the folder's name.
+  - A new responsibility requires a new folder and file, not a larger existing file.
 
 ## Data Files
 
@@ -30,6 +34,18 @@ Rules and practices for working on SABU.
 
 1. Add the new key to `locales/pt-BR.json` right away, using consistent key names.
 2. Use the key through the `i18n` loader. Never hardcode the text.
+3. Do not create or modify `locales/en.json` or any other locale file until that language is explicitly implemented.
+
+## Adding a Language
+
+1. Add the language metadata in `sabu_core/src/config/language.rs`: variant, locale code, display-name key, and number formatting if needed.
+2. Create `locales/<code>.json` with every key present in `locales/pt-BR.json`.
+3. Register the new file in `src/i18n/language_catalog/bundled_languages.rs` with `include_str!`.
+4. Add the language display-name key to every registered locale file, including `pt-BR.json`.
+5. Confirm that the language appears in `Translator::available_languages()` and in the language menu.
+6. Add tests for lookup, fallback, and number formatting.
+
+Until a language passes all these steps, it must not be registered or offered in the interface. In particular, `locales/en.json` must not be created or modified before English is explicitly implemented.
 
 ## Testing
 
@@ -39,6 +55,8 @@ Rules and practices for working on SABU.
 - Tests must include accented characters (for example, `ç`, `ã`, `é`).
 - Write tests in separate files, in the same folder as the code they test.
 - Do not write inline tests (`#[cfg(test)] mod tests { ... }`) inside source files.
+- Declare each test module from its folder's `mod.rs` with `#[cfg(test)] #[path = "..."] mod ...;`.
+- Shared test helpers belong in a dedicated file (for example, `commands/test_support.rs`) instead of being duplicated.
 
 ## Quality Checks
 
@@ -52,11 +70,12 @@ cargo clippy
 
 ## Checklist for Changes
 
-1. Decide where the change belongs: `sabu_core`, `commands`, `i18n`, or `ui`.
-2. Implement actions as `Command` structs.
-3. Add automated tests.
-4. Update `pt-BR.json` for new UI text.
-5. Check that performance is kept and the main event loop is not blocked.
-6. Run the quality checks.
-7. Update `AGENTS.md` if the project changed (important information only).
-8. If something is unclear, ask. Do not guess.
+1. Decide where the change belongs: `sabu_core`, `startup`, `commands`, `i18n`, or `ui`.
+2. Create a separate folder and file for any new responsibility; keep `mod.rs` to wiring only.
+3. Implement actions as `Command` structs.
+4. Add automated tests in the folder they cover.
+5. Update `pt-BR.json` for new UI text. Do not touch `en.json` or other locale files unless that language is being explicitly implemented.
+6. Check that performance is kept and the main event loop is not blocked.
+7. Run the quality checks.
+8. Update `AGENTS.md` if the project changed (important information only).
+9. If something is unclear, ask. Do not guess.

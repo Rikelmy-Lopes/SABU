@@ -43,9 +43,10 @@ This document contains the project overview, architectural constraints, sample d
 
 ### 2.4. Internationalization (i18n)
 
-- **Supported Languages:** Brazilian Portuguese (`pt-BR`) currently active, with English (`en`) support designed for future activation.
+- **Active Language:** Brazilian Portuguese (`pt-BR`) is the only active and maintained translation.
+- **Future Languages:** The i18n layer supports any number of bundled languages. A language becomes available only after its complete locale file is registered in `src/i18n/language_catalog/bundled_languages.rs` and its metadata exists in `Language`.
 - **Default Language:** `pt-BR`.
-- **Translation Storage:** Translations are stored in JSON files (e.g., `locales/pt-BR.json`, `locales/en.json`).
+- **Translation Storage:** Each active language has one JSON file in `locales/`. Only `locales/pt-BR.json` may be created or updated now. **Do not create or modify `locales/en.json` or any other locale file until that language is explicitly implemented.**
 - **Rule:** No user-facing text strings may be hardcoded in the source code (`core`, `commands`, or `ui`). All text labels, messages, and tooltips must resolve through the `i18n` dictionary loader.
 - **Missing Keys:** If a translation key is missing in the active language, the application must fall back to the Portuguese (`pt-BR`) text.
 - **Number, Date, and Plural Formatting:** Numbers, dates, and plurals must follow the Portuguese (`pt-BR`) or English (`en`) format, according to the active application language.
@@ -73,6 +74,14 @@ This document contains the project overview, architectural constraints, sample d
 
 - The application must save its configuration (language, theme, etc) in a `config.json` file inside `%LOCALAPPDATA%\Sabu`.
 
+### 2.10. Single Responsibility Principle (SRP)
+
+- **Strict rule:** every responsibility must live in its own folder and its own file.
+- Each folder represents one responsibility. Its `mod.rs` contains only wiring: `mod` declarations, re-exports, and `#[cfg(test)]` test module declarations.
+- Implementation files must not mix responsibilities. When a change adds a new responsibility, create a new folder and file instead of extending an unrelated file.
+- An implementation file must not have the same name as its containing folder (for example, avoid `config/config.rs`); use a name that describes the responsibility instead (for example, `config/user_config.rs`).
+- Tests for a responsibility live in the same folder as a separate `*_tests.rs` file.
+
 ---
 
 ## 3. Data Specification & Context
@@ -94,30 +103,72 @@ This document contains the project overview, architectural constraints, sample d
 3. **Test Location:**
    - Tests must be written in separate files, in the same folder as the code they test.
    - Do not write inline tests (`#[cfg(test)] mod tests { ... }`) inside source files.
-4. **Mandatory Quality Checks:**
+   - Declare the test module from the folder's `mod.rs` with `#[cfg(test)] #[path = "..."] mod ...;`.
+4. **Single Responsibility:**
+   - Place each responsibility in its own folder and file, as required by section 2.10.
+   - Keep `mod.rs` limited to wiring and re-exports.
+5. **Mandatory Quality Checks:**
    - Ensure `cargo check`, `cargo test`, and `cargo clippy` pass with zero warnings or errors before finalizing any modification.
 
 ---
 
 ## 5. Expected Code Structure
 
+Every folder below represents one responsibility. Its `mod.rs` only wires the
+folder's files together; implementation lives in the sibling files.
+
 ```text
 sabu/
-├── Cargo.toml               # Workspace root and application package
-├── sabu_core/               # Separate crate: business logic, CSV parser, analytics engine (GUI independent)
+├── Cargo.toml
+├── sabu_core/                       # Business logic, CSV parser, analytics (GUI independent)
 │   ├── Cargo.toml
 │   └── src/
+│       ├── lib.rs                   # Crate wiring
+│       ├── analytics/               # Vote aggregations
+│       ├── config/                  # Language, theme, and user configuration
+│       ├── dataset/                 # Dataset and its summary
+│       ├── error/                   # CoreError
+│       ├── model/                   # BulletinRecord
+│       ├── parser/                  # CSV decoding, columns, and numbers
+│       ├── paths/                   # Runtime file locations
+│       └── state/                   # AppState
 ├── example/
-│   └── data.csv             # Sample dataset for testing and reference
+│   └── data.csv                     # Sample dataset (read-only)
 ├── locales/
-│   ├── pt-BR.json           # Default Portuguese translations
-│   └── en.json              # English translations (future use)
+│   ├── pt-BR.json                   # Active Portuguese translations (update this)
+│   └── en.json                      # Reserved; not active (do not modify yet)
 ├── src/
-│   ├── main.rs
-│   ├── commands/            # Action handlers implementing the Command pattern
-│   ├── i18n/                # JSON translation loader and manager
-│   └── ui/                  # Graphical interface components (egui/eframe)
-└── BOLETIM-URNA-README.md   # Data dictionary and column definitions
+│   ├── main.rs                      # Entry point only
+│   ├── startup/                     # Paths, logging, configuration, and window creation
+│   ├── commands/                    # Command pattern
+│   │   ├── command/                 # Command trait
+│   │   ├── history/                 # Undo/redo stacks
+│   │   ├── load_dataset/            # Load dataset command
+│   │   ├── clear_dataset/           # Clear dataset command
+│   │   ├── set_language/            # Language command
+│   │   ├── set_theme/               # Theme command
+│   │   ├── dispatch/                # Worker thread and dispatcher
+│   │   └── test_support.rs          # Shared test helpers
+│   ├── i18n/                        # Translation loading and formatting
+│   │   ├── dictionary/              # Dictionary type
+│   │   ├── error/                   # I18nError
+│   │   ├── error_key/               # Core error to key mapping
+│   │   ├── language_catalog/        # Registry of bundled locale files
+│   │   ├── number_formatter/        # Locale-aware numbers
+│   │   └── translator/              # Key lookup with pt-BR fallback
+│   └── ui/                          # Graphical interface (egui/eframe)
+│       ├── analytics_cache/         # Cached analytics and bounded tables
+│       ├── content_panel/           # Central content area
+│       ├── file_bar/                # CSV path input
+│       ├── menu_bar/                # Menus and MenuAction
+│       ├── sabu_app/                # Main window orchestration
+│       ├── status_bar/              # Status bar
+│       ├── status_message/          # Status message
+│       ├── summary_grid/            # Dataset summary
+│       ├── theme/                   # Theme application
+│       ├── top_bar/                 # Top panel composition
+│       └── vote_table/              # Vote tables
+└── BOLETIM-URNA-README.md           # Data dictionary and column definitions
 ```
 
 ---
@@ -126,18 +177,40 @@ sabu/
 
 When implementing features or fixing bugs in **SABU**:
 
-1. **Maintain Architectural Boundaries:** Determine whether changes belong in `sabu_core`, `commands`, `i18n`, or `ui`. Do not mix concerns.
-2. **Encapsulate Actions:** Implement all user actions as discrete `Command` structs.
-3. **Write Tests Alongside Changes:** Never complete a task without associated automated tests proving correctness.
-4. **Enforce i18n Rules:** When adding new UI strings, update `pt-BR.json` immediately using consistent key naming conventions.
-5. **Verify Performance:** Ensure CSV parsing and data aggregation routines maintain high performance and never block the main event loop.
-6. **Use Clear Names:** Use clear, descriptive names and follow all Rust naming conventions as needed (`snake_case` for functions, variables, and modules; `UpperCamelCase` for types and traits; `SCREAMING_SNAKE_CASE` for constants).
-7. **Keep `AGENTS.md` Updated:** When the project changes, update `AGENTS.md` with important information only.
-8. **Ask When Unclear:** If something is unclear, ask. Do not guess.
+1. **Maintain Architectural Boundaries:** Determine whether changes belong in `sabu_core`, `commands`, `i18n`, `startup`, or `ui`. Do not mix concerns.
+2. **Create a Responsibility Folder:** Give every new responsibility its own folder and file, and keep `mod.rs` limited to wiring.
+3. **Encapsulate Actions:** Implement all user actions as discrete `Command` structs.
+4. **Write Tests Alongside Changes:** Never complete a task without associated automated tests proving correctness.
+5. **Enforce i18n Rules:** When adding new UI strings, update `pt-BR.json` immediately using consistent key naming conventions. Do not create or modify `en.json` or any other locale file until that language is explicitly implemented.
+6. **Verify Performance:** Ensure CSV parsing and data aggregation routines maintain high performance and never block the main event loop.
+7. **Use Clear Names:** Use clear, descriptive names and follow all Rust naming conventions as needed (`snake_case` for functions, variables, and modules; `UpperCamelCase` for types and traits; `SCREAMING_SNAKE_CASE` for constants).
+8. **Keep `AGENTS.md` Updated:** When the project changes, update `AGENTS.md` with important information only.
+9. **Ask When Unclear:** If something is unclear, ask. Do not guess.
 
 ## 7. Related Documentation
 
-- [readme.md](readme.md) — Project overview, structure, and runtime files.
+- [README.md](README.md) — Project overview, structure, and runtime files.
 - [docs/architecture.md](docs/architecture.md) — Architecture and design principles.
 - [docs/development.md](docs/development.md) — Development rules, testing, and quality checks.
 - [docs/ui-design.md](docs/ui-design.md) — User interface guidelines.
+
+## 8. Current Implementation Notes
+
+- The workspace, both crates, the command worker, i18n loader, locales, and the
+  initial `egui` window are already scaffolded.
+- Every responsibility now has its own folder and file. `mod.rs` files contain
+  only module wiring, re-exports, and test module declarations.
+- `sabu_core::Dataset` precomputes the summary and all analytics when it is
+  built, so aggregation happens on the command worker thread, never on the UI
+  thread.
+- The UI reads shared state with `try_lock` and must never block waiting for the
+  worker. It keeps a bounded cache of the tables (`MAX_TABLE_ROWS = 20`).
+- Translation JSON files are embedded with `include_str!` through
+  `src/i18n/language_catalog/bundled_languages.rs`; only registered languages
+  are loaded and offered by the interface.
+- Add new translation keys to `locales/pt-BR.json` only. Do not create or modify
+  `locales/en.json` or any other locale file until that language is implemented.
+- Test modules live in `*_tests.rs` files next to the code and are declared with
+  `#[cfg(test)] #[path = "..."] mod ...;` from the folder's `mod.rs`.
+- The WiX installer configuration is not set up yet.
+
