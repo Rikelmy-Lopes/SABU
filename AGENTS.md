@@ -8,6 +8,7 @@ This document contains the project overview, architectural constraints, sample d
 
 - **Project Name:** SABU (Sistema de Análise de Boletim de Urnas — Ballot Box Bulletin Analysis System)
 - **Primary Language:** Rust
+- **Target Platform:** Windows. The application is built to run on Windows.
 - **Graphical User Interface (GUI):** `egui` (via `eframe`)
 - **Objective:** Process, analyze, and display large volumes of data extracted from Ballot Box Bulletins (CSV format) in an extremely fast, intuitive, and testable manner.
 
@@ -42,6 +43,18 @@ This document contains the project overview, architectural constraints, sample d
 - **Default Language:** `pt-BR`.
 - **Translation Storage:** Translations are stored in JSON files (e.g., `locales/pt-BR.json`, `locales/en.json`).
 - **Rule:** No user-facing text strings may be hardcoded in the source code (`core`, `commands`, or `ui`). All text labels, messages, and tooltips must resolve through the `i18n` dictionary loader.
+- **Missing Keys:** If a translation key is missing in the active language, the application must fall back to the Portuguese (`pt-BR`) text.
+- **Number, Date, and Plural Formatting:** Numbers, dates, and plurals must follow the Portuguese (`pt-BR`) or English (`en`) format, according to the active application language.
+
+### 2.5. Language for Code Comments and Documentation
+
+- All code comments and documentation (including doc comments and README files) must be written **entirely in English**.
+- This rule does not apply to user-facing text, which must follow the i18n rules in section 2.4.
+
+### 2.6. Theme
+
+- The interface must support a dark theme and a white theme.
+- Both themes must use simple colors.
 
 ---
 
@@ -49,6 +62,8 @@ This document contains the project overview, architectural constraints, sample d
 
 - **Sample Data:** A small sample dataset is available at `example/data.csv`. Use this file for understanding data structure, schema validation, and unit/integration testing.
 - **Data Schema Reference:** Refer to `BOLETIM-URNA-README.md` for complete documentation on CSV columns, data types, and semantic definitions of electoral fields.
+- **Protected Files:** Never change `example/data.csv` or `BOLETIM-URNA-README.md`. They are read-only references.
+- **File Encoding:** CSV files use **Latin-1 (ISO-8859-1)** encoding. The parser must decode them as Latin-1 (e.g., using `encoding_rs`) and convert the text to UTF-8 internally. Tests must include accented characters (e.g., `ç`, `ã`, `é`).
 
 ---
 
@@ -91,5 +106,8 @@ When implementing features or fixing bugs in **SABU**:
 1. **Maintain Architectural Boundaries:** Determine whether changes belong in `core`, `commands`, `i18n`, or `ui`. Do not mix concerns.
 2. **Encapsulate Actions:** Implement all user actions as discrete `Command` structs.
 3. **Write Tests Alongside Changes:** Never complete a task without associated automated tests proving correctness.
-4. **Enforce i18n Rules:** When adding new UI strings, update `pt-BR.json` immediately using consistent key naming conventions (and prepare `en.json` keys where appropriate).
+4. **Enforce i18n Rules:** When adding new UI strings, update `pt-BR.json` immediately using consistent key naming conventions.
 5. **Verify Performance:** Ensure CSV parsing and data aggregation routines maintain high performance and never block the main event loop.
+6. **Use Clear Names:** Use clear, descriptive names written in `snake_case`.
+7. **Keep `AGENTS.md` Updated:** When the project changes, update `AGENTS.md` with important information only.
+8. **Ask When Unclear:** If something is unclear, ask. Do not guess.
