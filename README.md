@@ -23,6 +23,14 @@ sabu/
 ├── sabu_core/               # Business logic, CSV parser, analytics (GUI independent)
 │   ├── Cargo.toml
 │   └── src/
+│       ├── analytics/       # Vote aggregation by office, party, and candidate
+│       ├── config/          # Configuration types and JSON persistence
+│       ├── dataset/         # Loaded dataset and summary metadata
+│       ├── error/           # Core error type
+│       ├── model/           # Typed bulletin record and column definitions
+│       ├── parser/          # Latin-1 decoding, CSV reading, record mapping
+│       ├── paths/           # Runtime file locations
+│       └── state/           # Application state mutated by commands
 ├── example/
 │   └── data.csv             # Sample dataset (read-only)
 ├── locales/
@@ -30,8 +38,9 @@ sabu/
 │   └── ...                  # Future languages (one JSON file per language)
 ├── src/
 │   ├── main.rs
-│   ├── commands/            # Command pattern handlers
-│   ├── i18n/                # Translation loader and manager
+│   ├── commands/            # Command pattern handlers and background dispatcher
+│   ├── i18n/                # Translation loader, translator, number formatting
+│   ├── startup/             # Logging, configuration, and eframe launch
 │   └── ui/                  # Interface components (egui/eframe)
 ├── docs/
 │   ├── architecture.md

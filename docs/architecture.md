@@ -135,8 +135,13 @@ Test: if you cannot describe a file in one sentence without using "and", it has 
 | Location | Responsibility |
 |---|---|
 | `sabu_core/` | CSV parsing, business logic, analytics, state. No GUI code. |
-| `src/commands/` | Command pattern handlers for all actions. |
-| `src/i18n/` | JSON translation loader and manager. |
+| `sabu_core/src/parser/` | Latin-1 decoding, CSV reading, and record mapping. |
+| `sabu_core/src/analytics/` | Vote aggregation by office, party, and candidate. |
+| `sabu_core/src/config/` | Configuration types and JSON persistence. |
+| `sabu_core/src/state/` | Application state mutated by commands. |
+| `src/commands/` | Command pattern handlers for all actions and the background dispatcher. |
+| `src/i18n/` | JSON translation loader, translator, and locale number formatting. |
+| `src/startup/` | Logging, configuration loading, and `eframe` launch. |
 | `src/ui/` | `egui`/`eframe` interface components. |
 
 Do not mix these responsibilities.
