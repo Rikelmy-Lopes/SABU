@@ -17,7 +17,7 @@ Guidelines for the SABU graphical interface.
 
 ## Themes
 
-- The interface supports a **dark theme** and a **white theme**.
+- The interface supports a **dark theme** and a **light theme**.
 - Both themes use simple colors.
 - The selected theme is saved in `config.json`, in `%LOCALAPPDATA%\Sabu`.
 
@@ -32,7 +32,7 @@ Guidelines for the SABU graphical interface.
 
 ## Error Display
 
-- Errors are returned as `Result` and handled explicitly. The UI must not crash (`unwrap()` and `panic!` are not allowed).
+- Follow the error handling rules in [architecture.md](architecture.md#error-handling). The UI must not crash.
 - Error messages shown to the user also come from the `i18n` dictionary.
 
 ## Goal

@@ -37,6 +37,7 @@ sabu/
 │   ├── architecture.md
 │   ├── development.md
 │   ├── ui-design.md
+│   ├── STATUS.md
 │   └── BOLETIM-URNA-README.md   # Data dictionary and column definitions (read-only)
 └── AGENTS.md                # Guidelines for AI agents
 ```
@@ -59,4 +60,5 @@ Both files are stored in `%LOCALAPPDATA%\Sabu`:
 - [Architecture](docs/architecture.md)
 - [Development guide](docs/development.md)
 - [UI design](docs/ui-design.md)
+- [Status](docs/STATUS.md) — what is already done
 - [AGENTS.md](AGENTS.md) — guidelines for AI agents working on this project

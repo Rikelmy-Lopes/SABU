@@ -14,13 +14,13 @@ Rules and practices for working on SABU.
   - `snake_case` for functions, variables, and modules.
   - `UpperCamelCase` for types and traits.
   - `SCREAMING_SNAKE_CASE` for constants.
-- Never use `unwrap()` or `panic!` (including `expect()`).
-- Return `Result` from every operation that can fail, and handle errors explicitly.
+- Follow the error handling rules. See [Error Handling](architecture.md#error-handling).
 - Implement every user action as a separate `Command` struct.
 - Give every command a unique id, as a `&str` constant (for example, `FILE_OPEN` = `"file.open"`). Never rename an existing id. See [Command IDs](architecture.md#command-ids).
-- Follow the Single Responsibility Principle (SRP) strictly:
+- Follow the Single Responsibility Principle (SRP) strictly. See [what counts as a responsibility](architecture.md#what-is-a-responsibility):
   - Place each responsibility in a separate folder and a separate file.
   - A file, module, struct, or function must have only one reason to change.
+  - Use `mod.rs` in every module folder. It only declares submodules and re-exports. See [Module files](architecture.md#module-files-modrs).
 - Keep `sabu_core` free of GUI dependencies.
 
 ## Data Files
@@ -56,12 +56,17 @@ cargo clippy
 
 ## Checklist for Changes
 
-1. Decide where the change belongs: `sabu_core`, `commands`, `i18n`, or `ui`.
-2. Implement actions as `Command` structs, each with a unique id.
+This is the only list of steps for a change. Other files link here.
+
+1. Read [STATUS.md](STATUS.md) to see what is already done.
+2. Decide where the change belongs: `sabu_core`, `commands`, `i18n`, or `ui`.
+3. Implement actions as `Command` structs, each with a unique id.
    Place each responsibility in a separate folder and file (SRP).
-3. Add automated tests.
-4. Update `pt-BR.json` for new UI text.
-5. Check that performance is kept and the main event loop is not blocked.
-6. Run the quality checks.
-7. Update `AGENTS.md` if the project changed (important information only).
-8. If something is unclear, ask. Do not guess.
+4. Add automated tests.
+5. Update `pt-BR.json` for new UI text.
+6. Check that performance is kept and the main event loop is not blocked.
+7. Run the quality checks.
+8. Update [STATUS.md](STATUS.md) with what was done.
+9. Update `AGENTS.md` if the project changed (important information only).
+
+If something is unclear at any step, ask. Do not guess.

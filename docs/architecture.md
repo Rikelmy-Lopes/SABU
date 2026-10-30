@@ -11,6 +11,13 @@ SABU is a Cargo workspace with two parts:
 
 The crate is named `sabu_core` because the name `core` conflicts with Rust's built-in `core` crate.
 
+## Clean Architecture
+
+SABU uses Clean Architecture.
+
+- Code is split in layers. The business logic is in the center (`sabu_core`). The interface and other details are on the outside (`commands`, `i18n`, `ui`).
+- Business rules do not depend on the interface, files, or frameworks.
+
 ## Core / GUI Decoupling
 
 `sabu_core` is responsible for:
@@ -75,7 +82,8 @@ SABU handles large CSV files from electoral systems.
 
 ## Error Handling
 
-- Never use `unwrap()` or `panic!` (including `expect()`).
+- Never use `unwrap()` or `panic!` (including `expect()`) in production code.
+- Tests may use `unwrap()`, `expect()`, and `panic!`.
 - All operations that can fail return `Result` and handle errors explicitly.
 
 ## Logging
@@ -95,11 +103,32 @@ Configuration (language, theme, etc) is saved in `config.json` in `%LOCALAPPDATA
 
 SRP is applied strictly in the whole project.
 
-- **Strict rule:** every responsibility must live in its own folder and its own file.
-- A file, module, struct, or function has only one reason to change.
-- Implementation files must not mix responsibilities. When a change adds a new responsibility, create a new folder and file instead of extending an unrelated file.
+### What is a responsibility
+
+A responsibility is one reason to change: one cohesive concept or capability. Examples: one command, one CSV parser, one analytics calculation, one UI component, one translation loader.
+
+Test: if you cannot describe a file in one sentence without using "and", it has more than one responsibility.
+
+### Granularity
+
+- **Folder:** one feature or area (for example, `commands/`, `i18n/`, `csv/`). Create a new folder only for a new area, not for a single file.
+- **File:** one concept. This is usually one struct or trait, its `impl` blocks, and the private helpers that only it uses. Each `Command` has its own file.
+- **Function:** one reason to change.
+- **Keep together:** a type and its `impl` blocks, its private helpers, and small types that exist only to support it (for example, its error enum).
+- **Do not create** one file per function, or files with only a few lines that always change together with another file.
+- **Split a file** when it gets a second reason to change, or when it holds unrelated types or functions.
+
+### Rules
+
+- Implementation files must not mix responsibilities. When a change adds a new responsibility, create a new file (and a new folder if it is a new area) instead of extending an unrelated file.
 - An implementation file must not have the same name as its containing folder (for example, avoid `config/config.rs`); use a name that describes the responsibility instead (for example, `config/user_config.rs`).
 - Tests for a responsibility live in the same folder as a separate `*_tests.rs` file.
+
+### Module files (`mod.rs`)
+
+- Every module folder uses a `mod.rs` file. Do not use the `folder.rs` style.
+- `mod.rs` only declares submodules (`mod`, `pub mod`) and re-exports (`pub use`). It declares test files with `#[cfg(test)]`.
+- `mod.rs` has no implementation logic, because it is not an implementation file.
 
 ## Module Responsibilities
 
